@@ -1,8 +1,10 @@
 /**
  * request-approval action handler (rovo:action `request-approval`).
- * SKELETON: builds the human approval card text from a verdict.
- * Posting it as a Jira comment uses @forge/api (api.asApp().requestJira) —
- * marked TODO because it can only be exercised on a live site.
+ * Builds the human approval card for a HOLD verdict. Only hold-for-review
+ * verdicts get a card — an allow needs no human, and a veto must not be
+ * overrideable by one. Posting the card as a Jira comment uses @forge/api
+ * (api.asApp().requestJira) — that one call is still TODO because it can
+ * only be exercised on a live site.
  */
 
 'use strict';
@@ -25,11 +27,20 @@ function renderApprovalCard(verdict) {
 async function requestApproval(req) {
   const payload = (req && req.payload) || {};
   const verdict = JSON.parse(payload.verdictJson || '{}');
+
+  if (verdict.decision !== 'hold-for-review') {
+    return {
+      status: 'not-required',
+      decision: verdict.decision ?? null,
+      issueKey: payload.issueKey ?? null,
+    };
+  }
+
   const card = renderApprovalCard(verdict);
 
   // TODO(forge): POST /rest/api/3/issue/{issueKey}/comment with `card`
   // via @forge/api, then return the comment id.
-  return { status: 'skeleton', issueKey: payload.issueKey ?? null, cardPreview: card };
+  return { status: 'card-rendered', issueKey: payload.issueKey ?? null, cardPreview: card };
 }
 
 module.exports = { requestApproval, renderApprovalCard };

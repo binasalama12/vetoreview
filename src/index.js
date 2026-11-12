@@ -1,8 +1,11 @@
 /**
  * VetoReview — Forge function handlers (entry point referenced by manifest.yml).
- * SKELETON: assessRisk is fully wired to the pure rules engine today.
- * requestApproval / logVerdict contain TODOs for the live Forge APIs
- * (@forge/api Jira REST + Forge storage) — they need a real site to test.
+ * assessRisk is fully wired to the pure rules engine. requestApproval and
+ * logVerdict now run their real core logic (approval-card rendering with a
+ * hold-only gate; append-only audit logging via src/audit/store.js) — what
+ * still needs a live site is swapping in the Forge backends: the Jira REST
+ * comment POST and the Forge-storage audit backend. The local verdict
+ * pipeline (src/pipeline.js) exercises the same path end to end.
  */
 
 'use strict';

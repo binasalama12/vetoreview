@@ -3,7 +3,7 @@
 **Event:** Atlassian Codegeist 2026 · Category: Apps for Software Teams
 **Bonus tracks:** Best Agents (`rovo:agent` + reusable `action`s) · Best app with Atlassian MCP (`rovo:mcp`, pending capability check)
 **Hard deadline:** 23 Dec 2026 03:00 WIB · **Internal submit target: 20 Dec 2026**
-**Status:** scaffold (11 Nov 2026). Rules engine implemented + unit-tested; Forge wiring is skeleton.
+**Status:** scaffold 11 Nov 2026; build started early 12 Nov 2026 — verdict pipeline, approval-card rendering, and append-only audit store implemented + unit-tested locally (27 tests); live Forge wiring still pending a dev site.
 
 ---
 
@@ -61,9 +61,11 @@ Components:
 | Piece | File | State |
 |---|---|---|
 | Manifest (`rovo:agent`, 3 `action`s, `jira:issuePanel`, minimal scopes) | `manifest.yml` | skeleton, `rovo:mcp` block commented pending check |
-| Rules engine (pure JS, deterministic) | `src/rules/` | **implemented, 14 unit tests green** |
+| Rules engine (pure JS, deterministic) | `src/rules/` | **implemented, unit-tested** (27 tests across engine/store/actions/pipeline) |
 | Agent instructions (checkpoint persona, fail-closed) | `src/agent/prompt.md` | draft |
-| Action handlers | `src/actions/` | assess-risk wired to engine; approval/log are TODO skeletons |
+| Action handlers | `src/actions/` | assess-risk wired to engine; approval-card rendering (hold-only gate) and audit logging implemented — only the live Jira REST POST + Forge-storage backend remain TODO |
+| Verdict pipeline (assess → card → log) | `src/pipeline.js` | **implemented, unit-tested** |
+| Audit store (append-only, per issue) | `src/audit/store.js` | **implemented** with in-memory backend; Forge storage backend drops in behind the same `{ get, set }` interface |
 | Issue panel UI | `src/panel/` | placeholder HTML |
 | MCP tool definitions | `src/mcp/tools.js` | skeleton |
 
@@ -100,10 +102,13 @@ judgement logic.
 - [x] Rules engine + tests (done at scaffold)
 - [ ] App registered/deployed on a dev site; `assess-risk` callable by the agent and by automation
 - [ ] Approval card posted as a real Jira comment; audit log persisted in Forge storage
+      (card rendering + audit-log core implemented and tested locally; live posting/persistence pending the dev site)
 - [ ] Issue panel showing latest verdict + reasons
-- [ ] 3 fixed demo scenarios: (a) injection planted in an issue comment →
-      veto; (b) legitimate destructive request from the real user → hold →
-      human approves; (c) routine action → allow
+- [x] 3 fixed demo scenarios — implemented locally (`npm run demo` +
+      pipeline tests); re-run on the dev site once deployed: (a) injection
+      planted in an issue comment → veto; (b) legitimate destructive
+      request from the real user → hold → human approves; (c) routine
+      action → allow
 - [ ] Installation link + install instructions; demo video < 5 min (public YouTube)
 
 **Stretch (only if MVP is solid):**

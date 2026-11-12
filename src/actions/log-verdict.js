@@ -1,12 +1,16 @@
 /**
  * log-verdict action handler (rovo:action `log-verdict`).
- * SKELETON: defines the audit-log entry shape. Persistence uses Forge
- * storage (@forge/api storage.set under key `audit:<issueKey>`) — TODO
- * until the app runs on a live site. Entries are append-only by design:
- * an audit log an agent can rewrite is not an audit log.
+ * Appends the verdict to the per-issue audit log via the audit store
+ * (src/audit/store.js). On a live site the store runs on a Forge-storage
+ * backend under key `audit:<issueKey>`; locally the default in-memory
+ * backend is used — the handler code is identical either way.
+ * Entries are append-only by design: an audit log an agent can rewrite
+ * is not an audit log.
  */
 
 'use strict';
+
+const { defaultStore } = require('../audit/store');
 
 function buildAuditEntry(issueKey, verdict, nowIso) {
   return {
@@ -22,13 +26,13 @@ function buildAuditEntry(issueKey, verdict, nowIso) {
   };
 }
 
-async function logVerdict(req) {
+async function logVerdict(req, store = defaultStore) {
   const payload = (req && req.payload) || {};
   const verdict = JSON.parse(payload.verdictJson || '{}');
   const entry = buildAuditEntry(payload.issueKey ?? 'UNKNOWN', verdict, new Date().toISOString());
-
-  // TODO(forge): storage.set(`audit:${entry.issueKey}`, [...existing, entry])
-  return { status: 'skeleton', entry };
+  const stored = await store.append(entry.issueKey, entry);
+  const totalEntries = await store.count(entry.issueKey);
+  return { status: 'logged', entry: stored, totalEntries };
 }
 
 module.exports = { logVerdict, buildAuditEntry };
