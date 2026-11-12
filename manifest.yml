@@ -8,7 +8,7 @@
 # wired to the skeleton files under src/.
 
 app:
-  id: ari:cloud:ecosystem::app/00000000-0000-0000-0000-000000000000 # TODO: forge register
+  id: ari:cloud:ecosystem::app/53682c48-261e-4956-9f43-4b2b127f9ee6
   runtime:
     name: nodejs22.x
 
@@ -20,11 +20,10 @@ modules:
     - key: vetoreview-agent
       name: VetoReview
       description: >-
-        Safety reviewer for other agents in Jira and Confluence. Assesses a
-        planned action and the content that requested it, detects
-        prompt-injection and high-risk patterns, and returns ALLOW,
-        HOLD-FOR-REVIEW (human approval card) or VETO with human-readable
-        reasons. Never executes the reviewed action itself.
+        Safety reviewer for other agents in Jira and Confluence. Assesses
+        planned actions, detects prompt-injection and high-risk patterns,
+        and returns ALLOW, HOLD-FOR-REVIEW or VETO with reasons. Never
+        executes the reviewed action itself.
       prompt: src/agent/prompt.md
       conversationStarters:
         - Assess the risk of the last comment on this issue
@@ -41,32 +40,37 @@ modules:
     - key: assess-risk
       name: Assess risk
       description: >-
-        Classify a planned action (and the text that requested it) as
-        allow / hold-for-review / veto, with reasons. Read-only assessment:
-        does not perform the action.
+        Classify a planned action (and the text that requested it) as allow /
+        hold-for-review / veto, with reasons. Read-only assessment: does not
+        perform the action.
       function: assessRisk
       actionVerb: GET
       inputs:
-        - title: actionType
+        actionType:
+          title: actionType
           type: string
           required: true
           description: 'Planned action, e.g. comment, transition, delete-issue, bulk-delete, change-permissions, share-external.'
-        - title: contentText
+        contentText:
+          title: contentText
           type: string
           required: false
           description: Issue/comment/instruction text that requested the action (scanned for injection patterns).
-        - title: sourceType
+        sourceType:
+          title: sourceType
           type: string
           required: false
           description: 'Where the request came from: user-prompt, issue-description, comment, tool-output, webhook.'
-        - title: actorType
+        actorType:
+          title: actorType
           type: string
           required: false
           description: 'Who wants to act: agent, automation, human.'
-        - title: externalRecipients
-          type: array
+        externalRecipients:
+          title: externalRecipients
+          type: string
           required: false
-          description: External email addresses/domains the action would send data to.
+          description: Comma-separated external email addresses/domains the action would send data to.
     - key: request-approval
       name: Request human approval
       description: >-
@@ -74,12 +78,15 @@ modules:
         summarising the verdict and reasons. The reviewed action is NOT
         executed; a human decides.
       function: requestApproval
-      actionVerb: POST
+      actionVerb: CREATE
       inputs:
-        - title: issueKey
+        issueKey:
+          title: issueKey
           type: string
           required: true
-        - title: verdictJson
+          description: Jira issue key the verdict belongs to.
+        verdictJson:
+          title: verdictJson
           type: string
           required: true
           description: Serialised verdict produced by assess-risk.
@@ -87,14 +94,18 @@ modules:
       name: Log verdict
       description: Append a verdict to the per-issue audit log in Forge storage.
       function: logVerdict
-      actionVerb: POST
+      actionVerb: CREATE
       inputs:
-        - title: issueKey
+        issueKey:
+          title: issueKey
           type: string
           required: true
-        - title: verdictJson
+          description: Jira issue key the verdict belongs to.
+        verdictJson:
+          title: verdictJson
           type: string
           required: true
+          description: Serialised verdict produced by assess-risk.
 
   # --- Jira issue panel: veto / approval card UI ----------------------------
   jira:issuePanel:
