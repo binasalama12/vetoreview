@@ -1,17 +1,56 @@
 <!doctype html>
 <!--
-  VetoReview — Jira issue panel (Custom UI placeholder).
-  Fed by the panelResolver function in src/index.js, which now returns a
-  real view model (src/panel/resolver.js): latest verdict for this issue
-  (decision, score, reasons, matched patterns), a per-decision tally, and
-  the audit-entry count — all read from the audit store. What remains is
-  the frontend itself: render that view model with Forge Custom UI /
-  UI Kit during the wiring window — see SPEC.md roadmap.
+  VetoReview — Jira issue panel (Custom UI frontend).
+  Static resource served from src/panel (manifest resource key: panel).
+  The actual rendering lives in render.js (pure view-model → HTML, unit
+  tested in test/panel-render.test.js); this page only mounts it.
+
+  Data flow today: the host may inject the panelResolver view model as
+  window.__VETOREVIEW_VIEW_MODEL__ before this page runs; absent that,
+  the page renders the resolver's safe empty state instead of crashing.
+
+  LIVE WIRING TODO (17–18 Nov session, needs the dev site):
+  fetch the view model from the resolver with the Forge bridge instead —
+    import { invoke } from '@forge/bridge';   // via the Custom UI toolchain
+    const view = await invoke('panelResolver');
+  then pass `view` to VetoReviewPanel.renderPanel and set mount.innerHTML.
+  Nothing else in this page changes for that switch.
 -->
 <html lang="en">
-  <head><meta charset="utf-8" /><title>VetoReview</title></head>
+  <head>
+    <meta charset="utf-8" />
+    <title>VetoReview</title>
+    <style>
+      body { font-family: -apple-system, "Segoe UI", sans-serif; margin: 12px; color: #172b4d; }
+      .vr-panel h3 { margin: 0 0 8px; font-size: 14px; }
+      .vr-panel h4 { margin: 12px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: #5e6c84; }
+      .vr-verdict { font-size: 16px; font-weight: 600; margin: 4px 0; }
+      .vr-allow { color: #006644; }
+      .vr-hold { color: #974f0c; }
+      .vr-veto { color: #ae2a19; }
+      .vr-unknown, .vr-empty { color: #5e6c84; }
+      .vr-score, .vr-at, .vr-total, .vr-empty-note { margin: 4px 0; font-size: 13px; }
+      .vr-context, .vr-tally, .vr-reasons, .vr-patterns { margin: 4px 0; padding-left: 18px; font-size: 13px; }
+      .vr-patterns code { background: #f4f5f7; padding: 0 4px; border-radius: 3px; }
+    </style>
+  </head>
   <body>
-    <h2>VetoReview</h2>
-    <p>Skeleton panel. Latest verdict and audit log for this issue will appear here.</p>
+    <div id="vetoreview-panel">Loading VetoReview…</div>
+    <script src="./render.js"></script>
+    <script>
+      (function () {
+        var mount = document.getElementById('vetoreview-panel');
+        var emptyView = {
+          status: 'ready',
+          issueKey: 'UNKNOWN',
+          hasVerdict: false,
+          latest: null,
+          tally: { allow: 0, 'hold-for-review': 0, veto: 0 },
+          totalEntries: 0
+        };
+        var view = window.__VETOREVIEW_VIEW_MODEL__ || emptyView;
+        mount.innerHTML = window.VetoReviewPanel.renderPanel(view);
+      })();
+    </script>
   </body>
 </html>

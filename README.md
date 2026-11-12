@@ -57,7 +57,8 @@ src/
   actions/            Rovo action handlers (assess-risk / request-approval / log-verdict)
   agent/prompt.md     the reviewer agent's instructions
   panel/resolver.js   panel view model: latest verdict + tally from the audit store
-  panel/              Jira issue panel frontend (Custom UI) — placeholder UI
+  panel/render.js     pure view-model → HTML renderer (all fields escaped; Node + browser)
+  panel/index.html    Custom UI page — mounts render.js, styles the vr-* classes
   mcp/tools.js        MCP tool definitions for assess-risk (pending capability check)
   demo.js             the 3 fixed demo scenarios, run locally (npm run demo)
 test/                 rules engine, audit store, Forge backend, actions, pipeline, panel resolver
@@ -70,7 +71,7 @@ No Atlassian account is needed to work on the core: the rules engine is a
 pure Node module.
 
 ```bash
-npm test        # node --test — 47 tests, no dependencies to install
+npm test        # node --test — 59 tests, no dependencies to install
 npm run demo    # the 3 fixed scenarios: veto / hold + approval card / allow
 ```
 
@@ -115,11 +116,15 @@ locally, and the 3 fixed demo scenarios run end to end with
 `npm run demo`. The panel resolver (latest verdict + per-decision tally
 read from the audit store) and the Forge storage backend adapter behind
 the store's `{ get, set }` interface are also implemented and tested
-(47 tests) — the live switch is one line at startup once a dev site
-exists. Still pending a dev site: `forge register` + deploy, the Jira
-comment POST for approval cards, the panel frontend rendering the
-resolver's view model, and MCP exposure. **Next slice:** panel frontend
-(Custom UI) rendering the view model + the live wiring session (register/
-deploy, Forge-storage switch-on, comment POST) in the 19–30 Nov window.
+— the live switch is one line at startup once a dev site
+exists. The panel frontend (Custom UI) now renders that view model:
+`src/panel/render.js` is a pure, fully-escaped view-model → HTML renderer
+shared by the tests and the browser page (`src/panel/index.html`); only
+fetching the view model over the Forge bridge remains for the live
+session. Still pending a dev site: `forge register` + deploy, the Jira
+comment POST for approval cards, and MCP exposure. **Next slice:** the
+live wiring session (register/deploy, Forge-storage switch-on, comment
+POST, bridge fetch) in the 19–30 Nov window — groundwork in the 17–18
+Nov setup session.
 See `SPEC.md` for the roadmap to the internal submit target of
 **20 Dec 2026** (hard deadline 23 Dec 2026, 03:00 WIB).
