@@ -1,0 +1,149 @@
+# VetoReview — Forge app manifest (SKELETON)
+# Codegeist 2026 · Category: Apps for Software Teams
+# Bonus tracks targeted: Best Agents (rovo:agent + reusable actions),
+# Best app with Atlassian MCP (rovo:mcp — see note at the bottom).
+#
+# STATUS: scaffold only. `app.id` is a placeholder — replace it with the id
+# Forge generates on `forge register`. Module keys and function handlers are
+# wired to the skeleton files under src/.
+
+app:
+  id: ari:cloud:ecosystem::app/00000000-0000-0000-0000-000000000000 # TODO: forge register
+  runtime:
+    name: nodejs22.x
+
+modules:
+  # --- Rovo agent: the reviewer persona -------------------------------------
+  # Judges planned actions by other agents/automations BEFORE they execute,
+  # using the pure rules engine in src/rules/ plus (later) Rovo LLM reasoning.
+  rovo:agent:
+    - key: vetoreview-agent
+      name: VetoReview
+      description: >-
+        Safety reviewer for other agents in Jira and Confluence. Assesses a
+        planned action and the content that requested it, detects
+        prompt-injection and high-risk patterns, and returns ALLOW,
+        HOLD-FOR-REVIEW (human approval card) or VETO with human-readable
+        reasons. Never executes the reviewed action itself.
+      prompt: src/agent/prompt.md
+      conversationStarters:
+        - Assess the risk of the last comment on this issue
+        - Why was this action vetoed?
+        - Show the audit log for this issue
+      actions:
+        - assess-risk
+        - request-approval
+        - log-verdict
+
+  # --- Reusable actions: callable by the agent above AND by other agents ---
+  # --- / automations ("security checkpoint as a tool") ----------------------
+  action:
+    - key: assess-risk
+      name: Assess risk
+      description: >-
+        Classify a planned action (and the text that requested it) as
+        allow / hold-for-review / veto, with reasons. Read-only assessment:
+        does not perform the action.
+      function: assessRisk
+      actionVerb: GET
+      inputs:
+        - title: actionType
+          type: string
+          required: true
+          description: 'Planned action, e.g. comment, transition, delete-issue, bulk-delete, change-permissions, share-external.'
+        - title: contentText
+          type: string
+          required: false
+          description: Issue/comment/instruction text that requested the action (scanned for injection patterns).
+        - title: sourceType
+          type: string
+          required: false
+          description: 'Where the request came from: user-prompt, issue-description, comment, tool-output, webhook.'
+        - title: actorType
+          type: string
+          required: false
+          description: 'Who wants to act: agent, automation, human.'
+        - title: externalRecipients
+          type: array
+          required: false
+          description: External email addresses/domains the action would send data to.
+    - key: request-approval
+      name: Request human approval
+      description: >-
+        Post a human approval card (comment) on the issue for a held action,
+        summarising the verdict and reasons. The reviewed action is NOT
+        executed; a human decides.
+      function: requestApproval
+      actionVerb: POST
+      inputs:
+        - title: issueKey
+          type: string
+          required: true
+        - title: verdictJson
+          type: string
+          required: true
+          description: Serialised verdict produced by assess-risk.
+    - key: log-verdict
+      name: Log verdict
+      description: Append a verdict to the per-issue audit log in Forge storage.
+      function: logVerdict
+      actionVerb: POST
+      inputs:
+        - title: issueKey
+          type: string
+          required: true
+        - title: verdictJson
+          type: string
+          required: true
+
+  # --- Jira issue panel: veto / approval card UI ----------------------------
+  jira:issuePanel:
+    - key: vetoreview-panel
+      resource: panel
+      resolver:
+        function: panelResolver
+      title: VetoReview
+      icon: https://example.com/vetoreview-icon.png # TODO: real icon asset
+
+  # --- Function handlers -----------------------------------------------------
+  function:
+    - key: assessRisk
+      handler: index.assessRisk
+    - key: requestApproval
+      handler: index.requestApproval
+    - key: logVerdict
+      handler: index.logVerdict
+    - key: panelResolver
+      handler: index.panelResolver
+
+resources:
+  - key: panel
+    path: src/panel
+
+# Permissions: MINIMAL set for the MVP.
+# - read issues/pages so the agent can see what it is reviewing
+# - write comments so it can post approval cards and verdict notes
+# - app storage for the audit log
+# Deliberately NOT requested: delete scopes, admin scopes, user admin —
+# VetoReview judges actions, it never performs destructive ones.
+permissions:
+  scopes:
+    - read:jira-work
+    - write:jira-work # comments only in practice; used for approval cards
+    - read:confluence-content.all
+    - write:confluence-content # verdict notes on reviewed pages (MVP: comments)
+    - storage:app
+
+# --- PENDING CAPABILITY CHECK (first setup session) -------------------------
+# Bonus track "Best app with Atlassian MCP": expose assess-risk as a tool on
+# the Atlassian MCP server via a `rovo:mcp` module so external agents can call
+# VetoReview before acting. Availability of rovo:mcp on the free Developer
+# license MUST be verified live before enabling this block; if unavailable,
+# the app still qualifies for Best Agents via rovo:agent + actions above.
+#
+#  rovo:mcp:
+#    - key: vetoreview-mcp
+#      name: VetoReview risk tools
+#      description: Exposes assess-risk to external agents over Atlassian MCP.
+#      tools:
+#        - assess-risk
