@@ -52,13 +52,15 @@ src/
     patterns.js       pattern packs + personal-domain list
     engine.js         assess() → { decision, score, reasons, matches }
   pipeline.js         verdict pipeline: assess → approval card → audit log
-  audit/store.js      append-only audit store (in-memory now; Forge storage backend later)
+  audit/store.js      append-only audit store (in-memory backend now)
+  audit/forge-backend.js  Forge storage adapter behind the store's { get, set } interface
   actions/            Rovo action handlers (assess-risk / request-approval / log-verdict)
   agent/prompt.md     the reviewer agent's instructions
-  panel/              Jira issue panel (verdict card) — placeholder UI
+  panel/resolver.js   panel view model: latest verdict + tally from the audit store
+  panel/              Jira issue panel frontend (Custom UI) — placeholder UI
   mcp/tools.js        MCP tool definitions for assess-risk (pending capability check)
   demo.js             the 3 fixed demo scenarios, run locally (npm run demo)
-test/                 rules engine, audit store, action handlers, pipeline
+test/                 rules engine, audit store, Forge backend, actions, pipeline, panel resolver
 SPEC.md               architecture, MVP scope, roadmap to the 20 Dec internal submit
 ```
 
@@ -68,7 +70,7 @@ No Atlassian account is needed to work on the core: the rules engine is a
 pure Node module.
 
 ```bash
-npm test        # node --test — 27 tests, no dependencies to install
+npm test        # node --test — 47 tests, no dependencies to install
 npm run demo    # the 3 fixed scenarios: veto / hold + approval card / allow
 ```
 
@@ -109,11 +111,15 @@ Notes:
 Build (Nov 2026): rules engine implemented and tested; the verdict
 pipeline (assess → approval card → audit log), the hold-only approval-card
 renderer, and the append-only audit store are implemented and unit-tested
-locally (27 tests), and the 3 fixed demo scenarios run end to end with
-`npm run demo`. Still pending a dev site: the live Forge wiring (Jira
-comment POST, Forge-storage backend behind the existing store interface),
-the panel UI, and MCP exposure. **Next slice:** panel resolver reading the
-latest verdict from the audit store + the Forge storage backend adapter
-(the 19–30 Nov wiring window). See `SPEC.md` for the roadmap to the
-internal submit target of **20 Dec 2026** (hard deadline 23 Dec 2026,
-03:00 WIB).
+locally, and the 3 fixed demo scenarios run end to end with
+`npm run demo`. The panel resolver (latest verdict + per-decision tally
+read from the audit store) and the Forge storage backend adapter behind
+the store's `{ get, set }` interface are also implemented and tested
+(47 tests) — the live switch is one line at startup once a dev site
+exists. Still pending a dev site: `forge register` + deploy, the Jira
+comment POST for approval cards, the panel frontend rendering the
+resolver's view model, and MCP exposure. **Next slice:** panel frontend
+(Custom UI) rendering the view model + the live wiring session (register/
+deploy, Forge-storage switch-on, comment POST) in the 19–30 Nov window.
+See `SPEC.md` for the roadmap to the internal submit target of
+**20 Dec 2026** (hard deadline 23 Dec 2026, 03:00 WIB).

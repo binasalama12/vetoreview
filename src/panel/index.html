@@ -1,10 +1,12 @@
 <!doctype html>
 <!--
   VetoReview — Jira issue panel (Custom UI placeholder).
-  MVP plan: render the latest verdict for this issue (decision, score,
-  reasons, matched patterns) plus the audit trail, fed by the panelResolver
-  function in src/index.js reading Forge storage. Build the real frontend
-  (Forge Custom UI / UI Kit) during the build phase — see SPEC.md roadmap.
+  Fed by the panelResolver function in src/index.js, which now returns a
+  real view model (src/panel/resolver.js): latest verdict for this issue
+  (decision, score, reasons, matched patterns), a per-decision tally, and
+  the audit-entry count — all read from the audit store. What remains is
+  the frontend itself: render that view model with Forge Custom UI /
+  UI Kit during the wiring window — see SPEC.md roadmap.
 -->
 <html lang="en">
   <head><meta charset="utf-8" /><title>VetoReview</title></head>

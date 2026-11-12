@@ -3,7 +3,7 @@
 **Event:** Atlassian Codegeist 2026 · Category: Apps for Software Teams
 **Bonus tracks:** Best Agents (`rovo:agent` + reusable `action`s) · Best app with Atlassian MCP (`rovo:mcp`, pending capability check)
 **Hard deadline:** 23 Dec 2026 03:00 WIB · **Internal submit target: 20 Dec 2026**
-**Status:** scaffold 11 Nov 2026; build started early 12 Nov 2026 — verdict pipeline, approval-card rendering, and append-only audit store implemented + unit-tested locally (27 tests); live Forge wiring still pending a dev site.
+**Status:** scaffold 11 Nov 2026; build started early 12 Nov 2026 — verdict pipeline, approval-card rendering, append-only audit store, panel resolver, and Forge storage backend adapter implemented + unit-tested locally (47 tests); live Forge wiring still pending a dev site.
 
 ---
 
@@ -61,12 +61,13 @@ Components:
 | Piece | File | State |
 |---|---|---|
 | Manifest (`rovo:agent`, 3 `action`s, `jira:issuePanel`, minimal scopes) | `manifest.yml` | skeleton, `rovo:mcp` block commented pending check |
-| Rules engine (pure JS, deterministic) | `src/rules/` | **implemented, unit-tested** (27 tests across engine/store/actions/pipeline) |
+| Rules engine (pure JS, deterministic) | `src/rules/` | **implemented, unit-tested** (47 tests across engine/store/backends/actions/pipeline/panel) |
 | Agent instructions (checkpoint persona, fail-closed) | `src/agent/prompt.md` | draft |
 | Action handlers | `src/actions/` | assess-risk wired to engine; approval-card rendering (hold-only gate) and audit logging implemented — only the live Jira REST POST + Forge-storage backend remain TODO |
 | Verdict pipeline (assess → card → log) | `src/pipeline.js` | **implemented, unit-tested** |
-| Audit store (append-only, per issue) | `src/audit/store.js` | **implemented** with in-memory backend; Forge storage backend drops in behind the same `{ get, set }` interface |
-| Issue panel UI | `src/panel/` | placeholder HTML |
+| Audit store (append-only, per issue) | `src/audit/store.js` | **implemented** with in-memory backend; Forge storage adapter (`src/audit/forge-backend.js`) implemented + contract-tested behind the same `{ get, set }` interface — switch-on pending the dev site |
+| Panel resolver (latest verdict + tally view model) | `src/panel/resolver.js` | **implemented, unit-tested**; `panelResolver` handler wired to it in `src/index.js` |
+| Issue panel UI | `src/panel/` | placeholder HTML — frontend renders the resolver view model next slice |
 | MCP tool definitions | `src/mcp/tools.js` | skeleton |
 
 One engine, two doors: the same `assess()` code path serves the in-Atlassian
@@ -102,8 +103,9 @@ judgement logic.
 - [x] Rules engine + tests (done at scaffold)
 - [ ] App registered/deployed on a dev site; `assess-risk` callable by the agent and by automation
 - [ ] Approval card posted as a real Jira comment; audit log persisted in Forge storage
-      (card rendering + audit-log core implemented and tested locally; live posting/persistence pending the dev site)
+      (card rendering + audit-log core implemented and tested locally; Forge storage adapter implemented + contract-tested; live posting/persistence pending the dev site)
 - [ ] Issue panel showing latest verdict + reasons
+      (resolver view model implemented and tested locally; panel frontend rendering pending)
 - [x] 3 fixed demo scenarios — implemented locally (`npm run demo` +
       pipeline tests); re-run on the dev site once deployed: (a) injection
       planted in an issue comment → veto; (b) legitimate destructive
@@ -132,7 +134,7 @@ judgement logic.
 | Window | Work | Exit criteria |
 |---|---|---|
 | 17–18 Nov | Watch the official Forge + Rovo Build Session (18 Nov 00:00 WIB); install Forge CLI; `forge register` + deploy skeleton to dev site | App installs; agent answers a prompt |
-| 19–30 Nov | Wire live handlers: approval comment via Jira REST, audit log in Forge storage, issue panel reads storage | Demo scenario (a) works end-to-end on the dev site |
+| 19–30 Nov | Wire live handlers: approval comment via Jira REST, audit log in Forge storage, issue panel reads storage (resolver + Forge backend adapter already built and tested locally on 12 Nov — this window is now switch-on + frontend only) | Demo scenario (a) works end-to-end on the dev site |
 | 1–7 Dec | Capability check `rovo:mcp`; if available, expose `assess-risk` + write companion `skill.md` | MCP tool callable from an external agent, or documented no-go |
 | 8–14 Dec | Polish: panel UI, per-project thresholds, Confluence verdict note; freeze features 14 Dec | All 3 demo scenarios green on a clean site |
 | 15–18 Dec | Record video (< 5 min, public), write Devpost text (EN), installation link + config instructions, test install from the link on a fresh site | Submission package complete |
