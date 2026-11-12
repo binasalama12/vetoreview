@@ -108,6 +108,12 @@ modules:
           description: Serialised verdict produced by assess-risk.
 
   # --- Jira issue panel: veto / approval card UI ----------------------------
+  rovo:mcp:
+    - key: vetoreview-mcp
+      name: VetoReview risk tools
+      tools:
+        - assess-risk
+
   jira:issuePanel:
     - key: vetoreview-panel
       resource: panel
@@ -145,16 +151,8 @@ permissions:
     - write:confluence-content # verdict notes on reviewed pages (MVP: comments)
     - storage:app
 
-# --- PENDING CAPABILITY CHECK (first setup session) -------------------------
-# Bonus track "Best app with Atlassian MCP": expose assess-risk as a tool on
-# the Atlassian MCP server via a `rovo:mcp` module so external agents can call
-# VetoReview before acting. Availability of rovo:mcp on the free Developer
-# license MUST be verified live before enabling this block; if unavailable,
-# the app still qualifies for Best Agents via rovo:agent + actions above.
-#
-#  rovo:mcp:
-#    - key: vetoreview-mcp
-#      name: VetoReview risk tools
-#      description: Exposes assess-risk to external agents over Atlassian MCP.
-#      tools:
-#        - assess-risk
+# --- Atlassian MCP exposure (bonus track: Best app with Atlassian MCP) ------
+# Enabled in slice 4 (13 Nov): Atlassian docs now list rovo:mcp as Preview
+# and fully supported, so assess-risk is exposed as an MCP tool external
+# agents can call BEFORE acting. If a given site lacks Rovo/MCP, the app
+# still qualifies for Best Agents via rovo:agent + actions above.

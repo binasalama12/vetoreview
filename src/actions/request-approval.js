@@ -2,9 +2,13 @@
  * request-approval action handler (rovo:action `request-approval`).
  * Builds the human approval card for a HOLD verdict. Only hold-for-review
  * verdicts get a card — an allow needs no human, and a veto must not be
- * overrideable by one. Posting the card as a Jira comment uses @forge/api
- * (api.asApp().requestJira) — that one call is still TODO because it can
- * only be exercised on a live site.
+ * overrideable by one.
+ *
+ * Posting: when a `postComment` dependency is injected (on a live site,
+ * src/forge-runtime.js supplies the real Jira REST POST), the card is
+ * posted to the issue as an ADF comment and the comment id returned.
+ * Without it (local dev, tests, demo), the handler returns the rendered
+ * card with status 'card-rendered' — same gate, no silent fake post.
  */
 
 'use strict';
@@ -24,7 +28,57 @@ function renderApprovalCard(verdict) {
   return lines.join('\n');
 }
 
-async function requestApproval(req) {
+function adfText(text) {
+  return { type: 'text', text };
+}
+
+function adfParagraph(content) {
+  return { type: 'paragraph', content };
+}
+
+/**
+ * The same approval card as an Atlassian Document Format (ADF) document —
+ * the body format the Jira Cloud REST API (v3) requires for comments.
+ * Pure and structural: heading, decision line, context line, the reasons
+ * as a bullet list, and the closing human-decides line.
+ */
+function cardToAdf(verdict) {
+  return {
+    type: 'doc',
+    version: 1,
+    content: [
+      { type: 'heading', attrs: { level: 3 }, content: [adfText('⛔ VetoReview — human approval required')] },
+      adfParagraph([
+        { type: 'text', text: 'Decision: ', marks: [{ type: 'strong' }] },
+        adfText(`${verdict.decision}  `),
+        { type: 'text', text: 'Risk score: ', marks: [{ type: 'strong' }] },
+        adfText(`${verdict.score}/100`),
+      ]),
+      adfParagraph([
+        { type: 'text', text: 'Action under review: ', marks: [{ type: 'strong' }] },
+        adfText(`${verdict.actionType} (requested via ${verdict.sourceType}, actor: ${verdict.actorType})`),
+      ]),
+      adfParagraph([{ type: 'text', text: 'Why this was flagged:', marks: [{ type: 'strong' }] }]),
+      {
+        type: 'bulletList',
+        content: (verdict.reasons || []).map((r) => ({
+          type: 'listItem',
+          content: [adfParagraph([adfText(String(r))])],
+        })),
+      },
+      adfParagraph([adfText('A human must approve or reject this action. VetoReview does not execute it.')]),
+    ],
+  };
+}
+
+/**
+ * @param {object} req  Forge action request ({ payload: { issueKey, verdictJson } })
+ * @param {object} [deps]
+ * @param {(issueKey: string, adf: object) => Promise<string>} [deps.postComment]
+ *   Live comment poster; when present and the verdict is a hold, the card
+ *   is posted and the result status is 'card-posted' with the comment id.
+ */
+async function requestApproval(req, deps = {}) {
   const payload = (req && req.payload) || {};
   const verdict = JSON.parse(payload.verdictJson || '{}');
 
@@ -38,9 +92,12 @@ async function requestApproval(req) {
 
   const card = renderApprovalCard(verdict);
 
-  // TODO(forge): POST /rest/api/3/issue/{issueKey}/comment with `card`
-  // via @forge/api, then return the comment id.
+  if (typeof deps.postComment === 'function' && payload.issueKey) {
+    const commentId = await deps.postComment(payload.issueKey, cardToAdf(verdict));
+    return { status: 'card-posted', issueKey: payload.issueKey, commentId };
+  }
+
   return { status: 'card-rendered', issueKey: payload.issueKey ?? null, cardPreview: card };
 }
 
-module.exports = { requestApproval, renderApprovalCard };
+module.exports = { requestApproval, renderApprovalCard, cardToAdf };

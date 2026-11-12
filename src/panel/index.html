@@ -3,18 +3,18 @@
   VetoReview — Jira issue panel (Custom UI frontend).
   Static resource served from src/panel (manifest resource key: panel).
   The actual rendering lives in render.js (pure view-model → HTML, unit
-  tested in test/panel-render.test.js); this page only mounts it.
+  tested in test/panel-render.test.js); this page only mounts it and
+  fetches the view model.
 
-  Data flow today: the host may inject the panelResolver view model as
-  window.__VETOREVIEW_VIEW_MODEL__ before this page runs; absent that,
-  the page renders the resolver's safe empty state instead of crashing.
-
-  LIVE WIRING TODO (17–18 Nov session, needs the dev site):
-  fetch the view model from the resolver with the Forge bridge instead —
-    import { invoke } from '@forge/bridge';   // via the Custom UI toolchain
-    const view = await invoke('panelResolver');
-  then pass `view` to VetoReviewPanel.renderPanel and set mount.innerHTML.
-  Nothing else in this page changes for that switch.
+  Data flow (live wiring, slice 4):
+    1. If the Forge bridge is present (the page runs inside Jira), ask
+       the backend resolver for the view model:
+         window.__forge_bridge__.invoke('panelResolver')
+       loaded from the Forge global-bridge CDN script below.
+    2. Fallbacks, in order: a host-injected
+       window.__VETOREVIEW_VIEW_MODEL__ (local previews/tests), then the
+       resolver's safe empty state. The panel never crashes the issue
+       page — worst case it renders the empty state.
 -->
 <html lang="en">
   <head>
@@ -33,6 +33,7 @@
       .vr-context, .vr-tally, .vr-reasons, .vr-patterns { margin: 4px 0; padding-left: 18px; font-size: 13px; }
       .vr-patterns code { background: #f4f5f7; padding: 0 4px; border-radius: 3px; }
     </style>
+    <script src="https://forge.cdn.prod.atlassian-dev.net/global-bridge.js"></script>
   </head>
   <body>
     <div id="vetoreview-panel">Loading VetoReview…</div>
@@ -48,8 +49,19 @@
           tally: { allow: 0, 'hold-for-review': 0, veto: 0 },
           totalEntries: 0
         };
-        var view = window.__VETOREVIEW_VIEW_MODEL__ || emptyView;
-        mount.innerHTML = window.VetoReviewPanel.renderPanel(view);
+
+        function render(view) {
+          mount.innerHTML = window.VetoReviewPanel.renderPanel(view || emptyView);
+        }
+
+        var bridge = window.__forge_bridge__;
+        if (bridge && typeof bridge.invoke === 'function') {
+          bridge.invoke('panelResolver').then(render).catch(function () {
+            render(window.__VETOREVIEW_VIEW_MODEL__ || emptyView);
+          });
+        } else {
+          render(window.__VETOREVIEW_VIEW_MODEL__ || emptyView);
+        }
       })();
     </script>
   </body>
