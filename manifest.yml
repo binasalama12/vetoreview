@@ -1,11 +1,11 @@
-# VetoReview — Forge app manifest (SKELETON)
+# VetoReview — Forge app manifest
 # Codegeist 2026 · Category: Apps for Software Teams
 # Bonus tracks targeted: Best Agents (rovo:agent + reusable actions),
 # Best app with Atlassian MCP (rovo:mcp — see note at the bottom).
 #
-# STATUS: scaffold only. `app.id` is a placeholder — replace it with the id
-# Forge generates on `forge register`. Module keys and function handlers are
-# wired to the skeleton files under src/.
+# STATUS: live. `app.id` below is the real Forge registration id; the app is
+# deployed to the dev site bugbounty-test-lutviansyah-sec.atlassian.net.
+# Module keys and function handlers are wired to the files under src/.
 
 app:
   id: ari:cloud:ecosystem::app/53682c48-261e-4956-9f43-4b2b127f9ee6
@@ -120,7 +120,7 @@ modules:
       resolver:
         function: panelResolver
       title: VetoReview
-      icon: https://example.com/vetoreview-icon.png # TODO: real icon asset
+      icon: https://raw.githubusercontent.com/binasalama12/vetoreview-assets/main/vetoreview-icon.svg
 
   # --- Function handlers -----------------------------------------------------
   function:

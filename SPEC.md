@@ -1,9 +1,9 @@
 # VetoReview — Specification
 
 **Event:** Atlassian Codegeist 2026 · Category: Apps for Software Teams
-**Bonus tracks:** Best Agents (`rovo:agent` + reusable `action`s) · Best app with Atlassian MCP (`rovo:mcp`, pending capability check)
+**Bonus tracks:** Best Agents (`rovo:agent` + reusable `action`s) · Best app with Atlassian MCP (`rovo:mcp`, enabled in slice 4)
 **Hard deadline:** 23 Dec 2026 03:00 WIB · **Internal submit target: 20 Dec 2026**
-**Status:** scaffold 11 Nov 2026; build started early 12 Nov 2026 — verdict pipeline, approval-card rendering, append-only audit store, panel resolver, Forge storage backend adapter, and the panel frontend (Custom UI renderer) implemented + unit-tested locally (59 tests); live Forge wiring still pending a dev site.
+**Status:** scaffold 11 Nov 2026; build started early 12 Nov 2026 — verdict pipeline, approval-card rendering, append-only audit store, panel resolver, Forge storage backend adapter, and the panel frontend (Custom UI renderer) implemented + unit-tested locally. Slice 4 (13 Nov 2026, commit `e7c724f`) added the live Forge wiring — nodejs22.x runtime, live Jira REST comment posting, Forge storage backend in use, panel bridge fetch, `rovo:mcp` module, app icon — and the app is deployed and verified live on the dev site. 67 tests passing (re-run 13 Nov).
 
 ---
 
@@ -60,15 +60,15 @@ Components:
 
 | Piece | File | State |
 |---|---|---|
-| Manifest (`rovo:agent`, 3 `action`s, `jira:issuePanel`, minimal scopes) | `manifest.yml` | skeleton, `rovo:mcp` block commented pending check |
-| Rules engine (pure JS, deterministic) | `src/rules/` | **implemented, unit-tested** (59 tests across engine/store/backends/actions/pipeline/panel) |
+| Manifest (`rovo:agent`, 3 `action`s, `jira:issuePanel`, minimal scopes) | `manifest.yml` | **live** — registered app.id; `rovo:mcp` module enabled (slice 4); panel icon hosted from the `vetoreview-assets` repo |
+| Rules engine (pure JS, deterministic) | `src/rules/` | **implemented, unit-tested** (67 tests across engine/store/backends/actions/pipeline/panel) |
 | Agent instructions (checkpoint persona, fail-closed) | `src/agent/prompt.md` | draft |
-| Action handlers | `src/actions/` | assess-risk wired to engine; approval-card rendering (hold-only gate) and audit logging implemented — only the live Jira REST POST + Forge-storage backend remain TODO |
+| Action handlers | `src/actions/` | **implemented, unit-tested** — assess-risk wired to engine; approval-card rendering (hold-only gate) and audit logging implemented; live Jira REST comment POST + Forge-storage backend wired in slice 4 |
 | Verdict pipeline (assess → card → log) | `src/pipeline.js` | **implemented, unit-tested** |
-| Audit store (append-only, per issue) | `src/audit/store.js` | **implemented** with in-memory backend; Forge storage adapter (`src/audit/forge-backend.js`) implemented + contract-tested behind the same `{ get, set }` interface — switch-on pending the dev site |
+| Audit store (append-only, per issue) | `src/audit/store.js` | **implemented** with in-memory backend; Forge storage adapter (`src/audit/forge-backend.js`) implemented + contract-tested behind the same `{ get, set }` interface and active on the dev site (slice 4) |
 | Panel resolver (latest verdict + tally view model) | `src/panel/resolver.js` | **implemented, unit-tested**; `panelResolver` handler wired to it in `src/index.js` |
-| Issue panel UI | `src/panel/` | **implemented, unit-tested** — `render.js` pure view-model → HTML renderer (escaped) + `index.html` Custom UI page; only the Forge-bridge fetch of the view model remains for the live session |
-| MCP tool definitions | `src/mcp/tools.js` | skeleton |
+| Issue panel UI | `src/panel/` | **implemented, unit-tested, live** — `render.js` pure view-model → HTML renderer (escaped) + `index.html` Custom UI page; Forge-bridge fetch of the view model wired in slice 4 and the panel verified on the dev site |
+| MCP tool definitions | `src/mcp/tools.js` | **implemented** — assess-risk exposed to external agents via the `rovo:mcp` module (slice 4) |
 
 One engine, two doors: the same `assess()` code path serves the in-Atlassian
 Rovo agent and (once enabled) external agents over MCP. No duplicated
