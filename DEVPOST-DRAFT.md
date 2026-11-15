@@ -161,7 +161,7 @@ Forge · Rovo (agents + actions) · Atlassian MCP (`rovo:mcp`) · Node.js
 ## Production deployment (for the Developer Console Distribution form)
 
 - **Production deploy: DONE** — version **2.0.0** deployed to the Forge
-  **production** environment on 16 Nov 2026 (±01:52 WIB) via
+  **production** environment on 16 Nov 2026 (±01:41 WIB) via
   `forge deploy -e production` (lint clean, deploy SUCCESS). This unblocks
   Distribution → Sharing in the console; the installation link can now be
   generated there.
