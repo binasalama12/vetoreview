@@ -155,3 +155,23 @@ Forge · Rovo (agents + actions) · Atlassian MCP (`rovo:mcp`) · Node.js
   the panel is verified on issue `KAN-1`.
 - **Source code:** https://github.com/binasalama12/vetoreview
   (the panel icon is hosted at `github.com/binasalama12/vetoreview-assets`)
+- **Privacy policy:** https://binasalama12.github.io/vetoreview/privacy.html
+- **Terms of service:** https://binasalama12.github.io/vetoreview/terms.html
+
+## Production deployment (for the Developer Console Distribution form)
+
+- **Production deploy: DONE** — version **2.0.0** deployed to the Forge
+  **production** environment on 16 Nov 2026 (±01:52 WIB) via
+  `forge deploy -e production` (lint clean, deploy SUCCESS). This unblocks
+  Distribution → Sharing in the console; the installation link can now be
+  generated there.
+- **Distribution form values:** Company/Department = `BinaSalama`;
+  Customer support contact = `binasalama12@gmail.com`;
+  Privacy policy URL and Terms of Service URL = the GitHub Pages links
+  above (both verified live, HTTP 200); "Stores personal data" = **No**
+  (audit verdicts live only in the installing site's own Forge storage —
+  see the privacy policy).
+- Existing installations unchanged: development environment on
+  `bugbounty-test-lutviansyah-sec.atlassian.net` (Jira + Confluence,
+  version 2, Up-to-date). Production is deployed but not installed on any
+  site yet.
