@@ -153,6 +153,5 @@ Forge · Rovo (agents + actions) · Atlassian MCP (`rovo:mcp`) · Node.js
 - **Dev site (live demo):**
   `bugbounty-test-lutviansyah-sec.atlassian.net` — VetoReview installed;
   the panel is verified on issue `KAN-1`.
-- **Source code:** [TODO — confirm the public repo URL for the app source
-  before submitting; the panel icon is hosted at
-  `github.com/binasalama12/vetoreview-assets`]
+- **Source code:** https://github.com/binasalama12/vetoreview
+  (the panel icon is hosted at `github.com/binasalama12/vetoreview-assets`)
