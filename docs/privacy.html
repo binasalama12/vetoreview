@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VetoReview — Privacy Policy</title>
+<style>
+  body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 760px; margin: 2.5rem auto; padding: 0 1.2rem; line-height: 1.6; color: #1a1a1a; }
+  h1 { font-size: 1.7rem; } h2 { font-size: 1.15rem; margin-top: 2rem; }
+  .meta { color: #555; font-size: 0.92rem; }
+</style>
+</head>
+<body>
+<h1>VetoReview — Privacy Policy</h1>
+<p class="meta">Last updated: 16 November 2026 · Developer: Bina Salama · Contact: <a href="mailto:binasalama12@gmail.com">binasalama12@gmail.com</a></p>
+
+<p>VetoReview is an Atlassian Forge app that adds a safety-review panel and a Rovo agent to Jira and Confluence. It assesses planned actions by agents and automations — before they execute — and returns a verdict of <strong>ALLOW</strong>, <strong>HOLD-FOR-REVIEW</strong>, or <strong>VETO</strong> with human-readable reasons. This policy describes exactly what data the app processes and what it stores.</p>
+
+<h2>What the app processes</h2>
+<p>When a review is requested, the app reads the text of the relevant Jira issue or Confluence content (for example an issue description or a comment that requested an action) and scans it locally, inside the Forge runtime, against a fixed set of risk patterns (prompt-injection phrases, destructive-action requests, external data-sharing signals). Processing happens in memory at request time. The app does not execute the reviewed action itself.</p>
+
+<h2>What the app stores</h2>
+<p>The app stores an <strong>audit log of its own verdicts</strong> — the assessed action type, the verdict, the numeric risk score, the matched pattern identifiers, the reasons, and a timestamp — in Atlassian Forge app storage (<code>storage:app</code>) belonging to the site where the app is installed. This audit log stays inside the installing site's own Forge storage. It is not copied to any external server operated by the developer.</p>
+
+<h2>What the app does not do</h2>
+<ul>
+  <li>It does <strong>not</strong> sell, rent, or share data with advertisers or data brokers.</li>
+  <li>It does <strong>not</strong> send issue, comment, or page content to any third-party or external service. Risk assessment runs entirely within the Forge runtime using a local rules engine; no external AI or analytics service is called.</li>
+  <li>It does <strong>not</strong> store personal data outside the installing site's own audit log described above.</li>
+  <li>It does <strong>not</strong> track users across sites, and it contains no analytics or advertising trackers.</li>
+</ul>
+
+<h2>Data retention and deletion</h2>
+<p>Audit-log records live in the installing site's Forge storage and are under the control of that site's administrators. Uninstalling the app removes the app's access; site administrators may also request deletion of stored audit records by contacting the developer at the address above, and the developer will action verified requests.</p>
+
+<h2>Changes to this policy</h2>
+<p>If this policy changes, the updated version will be published at this URL with a new "Last updated" date.</p>
+
+<h2>Contact</h2>
+<p>Questions about this policy or the app's data handling: <a href="mailto:binasalama12@gmail.com">binasalama12@gmail.com</a>.</p>
+</body>
+</html>
