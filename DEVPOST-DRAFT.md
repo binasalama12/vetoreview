@@ -145,11 +145,12 @@ Forge · Rovo (agents + actions) · Atlassian MCP (`rovo:mcp`) · Node.js
 
 ## Try it out / links
 
-- **Installation link:** [TODO — generate in the Atlassian Developer
-  Console (Distribution → Sharing) and paste here; verify with
-  `CHECKLIST-INSTALL.md` on a fresh site before submitting]
-- **Demo video (< 5 min):** [TODO — public YouTube link; shot list in
-  `DEMO-SCENARIOS.md`]
+- **Installation link:** https://developer.atlassian.com/console/install/53682c48-261e-4956-9f43-4b2b127f9ee6?signature=AYABeKYaOpxUdKf%2BmPl6%2FC8BzDIAAAADAAdhd3Mta21zAEthcm46YXdzOmttczp1cy13ZXN0LTI6NzA5NTg3ODM1MjQzOmtleS83MDVlZDY3MC1mNTdjLTQxYjUtOWY5Yi1lM2YyZGNjMTQ2ZTcAuAECAQB4CxqLTo9l4lqXuFjNim1xJM%2Bp%2F3TVP9xHS2BrU5DRRucBww%2B9LK1oIgu9liOwPhgsXAAAAH4wfAYJKoZIhvcNAQcGoG8wbQIBADBoBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDHKMnOskwi5OXx%2FzLgIBEIA7zuERvhMx7ShEsGkCJm5Z8hk9ed%2Bt7tGaDRXY7BfQDQgmbBI9ZRnlrKpIjin2Om5ZKyqwiB1JHcdqFnsAB2F3cy1rbXMAS2Fybjphd3M6a21zOmV1LXdlc3QtMTo3MDk1ODc4MzUyNDM6a2V5LzQ2MzBjZTZiLTAwYzMtNGRlMi04NzdiLTYyN2UyMDYwZTVjYwC4AQICAHi9bVMAkme4qVQX1fQHo6ePw3H40A7cGfz7yrmSfBWMXgGys7iVbyvKbXxP2R%2BERAnvAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQM%2FVNU%2BxfhXtpy4%2BeYAgEQgDsvKNiIJmQha%2FJR9MFVh%2BPee9MRb%2BS8yIpLzcQKBiEpJmV5m14bJnObCM285wbWwmXa80cIEai5oxRxNQAHYXdzLWttcwBLYXJuOmF3czprbXM6dXMtZWFzdC0xOjcwOTU4NzgzNTI0MzprZXkvNmMxMjBiYTAtNGNkNS00OTg1LWI4MmUtNDBhMDQ5NTJjYzU3ALgBAgIAeDYASx0XCjkny4iLV6vz%2BKtEGSGT6kdt0QRpkn6D%2FlVEATS%2Bkr01q3xokP63tO9y6hEAAAB%2BMHwGCSqGSIb3DQEHBqBvMG0CAQAwaAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAydBB73g1k8hMBXv2oCARCAO39zZoIuJS%2BmBrVEmrJ6IgA8F1fJ1zjpKdaHLgS0A2U1ATDnB8LEBbE99JXX4bf6vnTBM2yrpM%2BXFlGLAgAAAAAMAAAQAAAAAAAAAAAAAAAAALXlLoMZ9AUd1%2B%2BpIFCeR23%2F%2F%2F%2F%2FAAAAAQAAAAAAAAAAAAAAAQAAADLYca5QP7JeElGHKitiRiVejalAAYvxbT4pCWzLsotMiL4NN4aWEfNVduBCgJnFkVRw9S6KQy%2Bt51Bc%2BYRL3gjArW0%3D&product=confluence&product=jira
+  (Distribution status "Sharing with anyone", production v2.0.0 deployed
+  16 Nov 2026 01:43 WIB; scopes: Storage API, Confluence read/write
+  content, Jira view + create/manage issues)
+- **Demo video (< 5 min):** https://www.youtube.com/watch?v=qjsP0NLPSlQ
+  (unlisted, 3:18, uploaded 16 Nov 2026; shot list in `DEMO-SCENARIOS.md`)
 - **Dev site (live demo):**
   `bugbounty-test-lutviansyah-sec.atlassian.net` — VetoReview installed;
   the panel is verified on issue `KAN-1`.

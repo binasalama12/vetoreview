@@ -71,7 +71,7 @@ No Atlassian account is needed to work on the core: the rules engine is a
 pure Node module.
 
 ```bash
-npm test        # node --test — 59 tests, no dependencies to install
+npm test        # node --test — 67 tests, no dependencies to install
 npm run demo    # the 3 fixed scenarios: veto / hold + approval card / allow
 ```
 
@@ -100,9 +100,10 @@ forge install         # install on your Jira/Confluence dev site
 
 Notes:
 
-- The `rovo:mcp` module block in `manifest.yml` is commented out until its
-  availability on the free Developer license is verified live; the app
-  qualifies for Best Agents without it.
+- The `rovo:mcp` module block in `manifest.yml` is **active** (slice 4,
+  13 Nov): `assess-risk` is exposed as an MCP tool. If a given site lacks
+  Rovo/MCP, the app still qualifies for Best Agents via `rovo:agent` +
+  actions.
 - Requested scopes are deliberately minimal (read work, comment, app
   storage). VetoReview requests **no** delete or admin scopes — it judges
   destructive actions, it never performs them.
@@ -121,10 +122,13 @@ exists. The panel frontend (Custom UI) now renders that view model:
 `src/panel/render.js` is a pure, fully-escaped view-model → HTML renderer
 shared by the tests and the browser page (`src/panel/index.html`); only
 fetching the view model over the Forge bridge remains for the live
-session. Still pending a dev site: `forge register` + deploy, the Jira
-comment POST for approval cards, and MCP exposure. **Next slice:** the
-live wiring session (register/deploy, Forge-storage switch-on, comment
-POST, bridge fetch) in the 19–30 Nov window — groundwork in the 17–18
-Nov setup session.
+session. **Live status (16 Nov):** the app is registered (`forge register`
+done, real `app.id` in `manifest.yml`), deployed to production (v2.0.0)
+and to the dev site `bugbounty-test-lutviansyah-sec.atlassian.net`, where
+the panel is verified on issue `KAN-1`; the installation link is live
+(Distribution "Sharing with anyone", see `DEVPOST-DRAFT.md`). **Still
+pending:** the fresh-site install test in `CHECKLIST-INSTALL.md` (needs a
+second Atlassian Cloud dev site + site-admin login — user-side, see
+`INSTALL-TEST-2026-11-23.md`).
 See `SPEC.md` for the roadmap to the internal submit target of
 **20 Dec 2026** (hard deadline 23 Dec 2026, 03:00 WIB).
